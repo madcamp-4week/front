@@ -1,95 +1,138 @@
-// app/page.tsx
 'use client';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import Navigation from '@/components/nav'; // 파일 경로는 실제 위치에 맞게 수정
 
-import { useState, useRef } from 'react';
-import Head from 'next/head';
+export default function HomePage() {
+  const iconPositions = [
+    { top: '5%', left: '10%' },
+    { top: '15%', left: '5%' },
+    { top: '35%', left: '12%' },
+    { bottom: '25%', left: '8%' },
+    { bottom: '15%', left: '18%' },
+    { top: '10%', right: '12%' },
+    { top: '40%', right: '4%' },
+    { bottom: '20%', right: '16%' },
+    { bottom: '10%', right: '6%' },
+  ];
 
-export default function Home() {
-  const [nickname, setNickname] = useState('');
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [score, setScore] = useState<number | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = mediaRecorder;
-    audioChunksRef.current = [];
-
-    mediaRecorder.ondataavailable = (e) => {
-      audioChunksRef.current.push(e.data);
-    };
-
-    mediaRecorder.onstop = () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setAudioUrl(audioUrl);
-      const duration = audioBlob.size / 1000;
-      const estimatedScore = duration > 8000 ? 85 : duration > 5000 ? 70 : 40;
-      setScore(Math.floor(estimatedScore));
-    };
-
-    mediaRecorder.start();
-    setIsRecording(true);
-  };
-
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
-    setIsRecording(false);
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setLoaded(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 py-12">
-      <Head>
-        <title>쇼미더AI</title>
-      </Head>
-      <h1 className="text-4xl md:text-6xl font-bold mb-10">쇼미더AI 🎤</h1>
+    <>
+      <Navigation />
+      <main className="relative min-h-screen bg-black overflow-hidden flex items-center justify-center">
+      {/* 스포트라이트 효과 */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,0,0.15),rgba(0,0,0,0.95))]" />
+      
+      {/* 배경 스트라이프 */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0" 
+             style={{
+               background: `repeating-linear-gradient(
+                 45deg,
+                 transparent,
+                 transparent 20px,
+                 rgba(255, 255, 255, 0.05) 20px,
+                 rgba(255, 255, 255, 0.05) 40px
+               )`
+             }}
+        />
+      </div>
 
-      {!score ? (
-        <div className="w-full max-w-xl bg-zinc-900 p-6 rounded-xl shadow-xl text-center">
-          <label className="block mb-4">
-            <span className="block mb-2 text-lg">닉네임</span>
-            <input
-              className="w-full px-4 py-2 rounded bg-zinc-800 border border-zinc-700 text-white"
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="예: 랩천재광호"
+      {/* 메인 로고 섹션 */}
+      <div className="z-10 text-center">
+        {/* 로고 위 텍스트 */}
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className="mb-6"
+        >
+          <div className="text-yellow-400 text-lg font-bold tracking-[0.3em] mb-2">
+            ◆ WELCOME TO THE STAGE ◆
+          </div>
+        </motion.div>
+
+        {/* 로고 */}
+        <motion.div
+          initial={{ y: -300, opacity: 0, rotateX: 90 }}
+          animate={{ y: 0, opacity: 1, rotateX: 0 }}
+          transition={{ type: 'spring', stiffness: 80, damping: 12 }}
+          className="relative mb-8"
+        >
+          {/* 로고 백그라운드 글로우 */}
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/30 via-yellow-500/30 to-yellow-600/30 blur-3xl rounded-lg transform scale-110" />
+          
+          <div className="relative">
+            <Image
+              src="/show-me-logo.png"
+              alt="Show Me The Money"
+              width={640}
+              height={384}
+              priority
+              className="drop-shadow-[0_10px_30px_rgba(255,215,0,0.6)] filter brightness-110 contrast-125 scale-105 rotate-1"
             />
-          </label>
+          </div>
+        </motion.div>
 
-          <button
-            onClick={isRecording ? stopRecording : startRecording}
-            className={`w-full py-3 rounded font-bold text-lg transition-all ${
-              isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'
-            }`}
-          >
-            {isRecording ? '🛑 녹음 중지' : '🎙️ 랩 시작'}
-          </button>
-        </div>
-      ) : (
-        <div className="text-center">
-          <p className="text-2xl mb-4">🎤 {nickname}, 당신의 점수는...</p>
-          <p className="text-5xl font-bold mb-6">{score}점</p>
-          <p className="text-lg">
-            {score >= 70 ? '🔥 예선 통과! 당신은 진짜입니다.' : '😢 탈락... 다음 기회를 노려보세요.'}
-          </p>
-          {audioUrl && <audio controls src={audioUrl} className="mt-4" />}
+        {/* 서브타이틀 */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="mb-12"
+        >
+          <div className="text-yellow-100 text-sm font-light tracking-widest border border-yellow-400/20 px-6 py-2 rounded-full backdrop-blur-sm">
+            RAP BATTLE • BEATS • MONEY
+          </div>
+        </motion.div>
+      </div>
 
-          <button
-            className="mt-6 px-6 py-2 bg-zinc-700 hover:bg-zinc-600 rounded"
-            onClick={() => {
-              setScore(null);
-              setNickname('');
-              setAudioUrl(null);
-            }}
-          >
-            다시하기
+      {/* START 버튼 */}
+      {loaded && (
+        <motion.div
+          initial={{ opacity: 0, y: 100, scale: 0.5 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 1.8, duration: 1, type: 'spring', stiffness: 100 }}
+          className="absolute bottom-24"
+        >
+          <button className="group relative px-10 py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold text-xl tracking-widest rounded-full shadow-xl border-4 border-yellow-500 transition-all duration-300 hover:scale-110">
+            <span className="relative z-10 drop-shadow-sm">START</span>
+            <div className="absolute inset-0 bg-yellow-300 rounded-full blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-300" />
           </button>
-        </div>
+        </motion.div>
       )}
-    </main>
+
+      {/* 하단 장식 */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-6">
+        <div className="w-12 h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent" />
+        <div className="flex space-x-2">
+          {[...Array(3)].map((_, idx) => (
+            <motion.div
+              key={idx}
+              className="w-3 h-3 border border-yellow-400 rounded-full"
+              animate={{ 
+                backgroundColor: ['rgba(250, 204, 21, 0)', 'rgba(250, 204, 21, 1)', 'rgba(250, 204, 21, 0)']
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 1.6, 
+                ease: 'easeInOut',
+                delay: idx * 0.4 
+              }}
+            />
+          ))}
+        </div>
+        <div className="w-12 h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent" />
+      </div>
+      </main>
+    </>
   );
 }

@@ -6,11 +6,16 @@ import { useEffect, useState } from 'react';
 export default function ApplicationFormPage() {
   const [nickname, setNickname] = useState('');
   const [isVisible, setIsVisible] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Trigger animation on mount
     setIsVisible(true);
+    setTimeout(() => setShowForm(true), 400);
+    setTimeout(() => setShowInput(true), 800);
+    setTimeout(() => setShowConfirm(true), 1200);
   }, []);
 
   return (
@@ -28,7 +33,7 @@ export default function ApplicationFormPage() {
           className="mt-[-12px] object-contain w-full max-w-[887px]"
         />
 
-        <div className="w-full flex justify-center mt-4">
+        <div className={`w-full flex justify-center mt-4 transition-all duration-500 ${showForm ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Image
             src="/icon/application_form.svg"
             alt="Application Form Icon"
@@ -38,7 +43,7 @@ export default function ApplicationFormPage() {
           />
         </div>
 
-        <div className="w-full flex justify-center items-center gap-6 mt-10">
+        <div className={`w-full flex justify-center items-center gap-6 mt-10 transition-all duration-500 ${showInput ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Image
             src="/icon/rap_name.svg"
             alt="RapName Icon"
@@ -58,7 +63,7 @@ export default function ApplicationFormPage() {
           </div>
         </div>
         {/* Confirm icon at the bottom center */}
-        <div className="w-full flex justify-center mt-auto mb-[40px]">
+        <div className={`w-full flex justify-center mt-auto mb-[40px] transition-all duration-500 ${showConfirm ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <button
             className="hover:opacity-80 transition-opacity"
             onClick={() => {

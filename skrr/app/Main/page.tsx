@@ -1,13 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import NavBar from '@/components/NavBar';
 import { SendHorizonal } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function HomePage() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const { data, error } = await supabase
+        .from('histories')
+        .select('*')
+        .eq('user_id', 'guest')
+        .order('created_at', { ascending: true });
+
+      if (data) {
+        const historyItems = data.map((entry) => ({
+          id: entry.id,
+          input: entry.input,
+          title: entry.title,
+          url: entry.url,
+        }));
+        setHistory(historyItems);
+      }
+    };
+
+    fetchHistory();
+  }, []);
 
   const handleSubmit = async () => {
     if (!input.trim() || loading) return;
@@ -23,8 +49,16 @@ export default function HomePage() {
         body: JSON.stringify({ topic }),
       });
       const data = await res.json();
-      if (res.ok) {
-        // data.url에는 노션 페이지 URL이, data.title에는 제목이 들어 있습니다.
+      if (res.ok && data.title) {
+        await supabase.from('histories').insert([
+          {
+            user_id: 'guest',
+            input: topic,
+            title: data.title,
+            url: data.url,
+          }
+        ]);
+
         setMessages((prev) => [
           ...prev,
           `블로그가 생성되었습니다: ${data.title}`,
@@ -41,45 +75,85 @@ export default function HomePage() {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen flex flex-col">
-      <NavBar />
-
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24">
-        <h1 className="text-2xl text-purple-400 font-semibold mb-6">
-          광호님, 안녕하세요
-        </h1>
-
-        <div className="w-full max-w-2xl bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
-          {messages.length === 0 ? (
-            <p className="text-gray-500 text-center">무엇이든 질문해보세요</p>
-          ) : (
-            messages.map((msg, idx) => (
-              <div key={idx} className="text-white bg-purple-500/10 p-3 rounded-lg">
-                <span dangerouslySetInnerHTML={{ __html: msg }} />
-              </div>
-            ))
-          )}
-        </div>
-
-        <div className="w-full max-w-2xl mt-6 flex items-center border border-white/10 bg-white/5 rounded-full px-4 py-2">
-          <button onClick={handleSubmit} disabled={loading}>
-            <SendHorizonal className="w-20 h-5" />
+    <div className="bg-black text-white min-h-screen relative">
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="z-60 px-3 py-1 rounded fixed left-4 top-4"
+      >
+        <Image src="/icon/menu_icon.svg" alt="Toggle Sidebar" width={18} height={18} />
+      </button>
+      <aside
+        className={`fixed top-0 left-0 h-full w-64 bg-gray-900 border-r border-white/10 p-4 flex flex-col items-center transform transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="relative w-full mb-4 text-center">
+          <h2 className="text-lg font-semibold text-purple-300">검색 기록</h2>
+          <button
+            onClick={() => setMessages([])}
+            className="absolute right-1 top-0.5"
+          >
+            <Image src="/icon/newpage_icon.svg" alt="초기화" width={18} height={18} />
           </button>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSubmit();
-            }}
-            className="w-full"
-          />
         </div>
-      </main>
-
-      <footer className="text-center py-6 text-gray-600 text-sm border-t border-white/10">
-        © 2025 Agent Platform
-      </footer>
+        {history.map((item) => (
+          <button
+            key={item.id}
+            onClick={() =>
+              setMessages([
+                `블로그 생성 요청: ${item.input}`,
+                `블로그가 생성되었습니다: ${item.title}`,
+                `<a href="${item.url}" target="_blank" class="underline text-blue-400">노션 페이지로 이동</a>`,
+              ])
+            }
+            className="text-center w-full text-white mb-2 hover:text-purple-400"
+          >
+            {item.input}
+          </button>
+        ))}
+      </aside>
+      <div
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+          sidebarOpen ? 'pl-64' : ''
+        }`}
+      >
+        <div className="w-full">
+          <NavBar />
+        </div>
+        <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24">
+          <h1 className="text-2xl text-purple-400 font-semibold mb-6">
+            광호님, 안녕하세요
+          </h1>
+          <div className="w-full max-w-2xl bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+            {messages.length === 0 ? (
+              <p className="text-gray-500 text-center">무엇이든 질문해보세요</p>
+            ) : (
+              messages.map((msg, idx) => (
+                <div key={idx} className="text-white bg-purple-500/10 p-3 rounded-lg">
+                  <span dangerouslySetInnerHTML={{ __html: msg }} />
+                </div>
+              ))
+            )}
+          </div>
+          <div className="w-full max-w-2xl mt-6 flex items-center border border-white/10 bg-white/5 rounded-full px-4 py-2">
+            <button onClick={handleSubmit} disabled={loading}>
+              <SendHorizonal className="w-20 h-5" />
+            </button>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSubmit();
+              }}
+              className="w-full"
+            />
+          </div>
+        </main>
+        <footer className="text-center py-6 text-gray-600 text-sm border-t border-white/10">
+          © 2025 Agent Platform
+        </footer>
+      </div>
     </div>
   );
 }

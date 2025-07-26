@@ -165,49 +165,44 @@ const AiMarketingLanding = () => {
         </div>
       </section>
 
-      {/* Second Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-5xl font-bold mb-6">
-                <span className="text-purple-400">AI Marketing</span>
-                <br />
-                <span className="text-white">Optimized Reach</span>
-              </h2>
-              
-              <p className="text-gray-300 mb-6">
-                DOML is a digital media agency powered by AI technology providing real time,{' '}
-                <span className="text-blue-400 underline">data-driven insights</span> on your business and audience.
-              </p>
-              
-              <p className="text-gray-300 mb-8">
-                The mission of DOML is to create the best experiences for companies through intelligent insights, powerful analytics and{' '}
-                <span className="text-blue-400 underline">strategic execution</span>.
-              </p>
-              
-              <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300">
-                Learn more
-                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
+     {/* 두 번째 섹션 */}
+<section className="py-20 relative">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <h2 className="text-5xl font-bold mb-6">
+          <span className="text-purple-400">AI Marketing</span>
+          <br />
+          <span className="text-white">Optimized Reach</span>
+        </h2>
+        
+        <p className="text-gray-300 mb-6">
+          DOML is a digital media agency powered by AI technology providing real time,{' '}
+          <span className="text-blue-400 underline">data-driven insights</span> on your business and audience.
+        </p>
+        
+        <p className="text-gray-300 mb-8">
+          The mission of DOML is to create the best experiences for companies through intelligent insights, powerful analytics and{' '}
+          <span className="text-blue-400 underline">strategic execution</span>.
+        </p>
+        
+        <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300">
+          Learn more
+          <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
 
-            <div className="relative">
-              <div className="w-80 h-80 mx-auto relative">
-                {/* 3D Cube */}
-                <div className="absolute inset-0 transform rotate-12 hover:rotate-0 transition-transform duration-700">
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500 via-blue-500 to-pink-500 rounded-3xl opacity-80 shadow-2xl shadow-purple-500/25"></div>
-                  <div className="absolute inset-4 bg-gradient-to-tl from-blue-600 via-purple-600 to-cyan-500 rounded-2xl opacity-70"></div>
-                  <div className="absolute inset-8 bg-black/30 rounded-xl backdrop-blur-sm"></div>
-                </div>
-                
-                {/* Reflection */}
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-64 h-32 bg-gradient-to-t from-purple-500/20 to-transparent rounded-full blur-xl opacity-40"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="relative flex justify-center">
+        <img
+          src="/1.png"
+          alt="Agent Cube"
+          className="w-80 h-80 object-contain transition-transform duration-700 hover:scale-105"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Third Section */}
       <section className="py-20 relative">

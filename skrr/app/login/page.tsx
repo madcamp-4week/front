@@ -39,12 +39,25 @@ const CognitoLogin: React.FC = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://icacobhgcxolgekoxbga.supabase.co/auth/v1/callback', // 로그인 후 리다이렉션될 URL (프로덕션에서는 https://yourdomain.com)
+    },
+  });
+
+  if (error) {
+    alert('❌ Google 로그인 실패: ' + error.message);
+  }
+};
+
   return (
     <div className="w-full min-h-screen relative overflow-hidden bg-black flex flex-col items-center pt-5 pb-0">
         <a href="/" className="text-white text-5xl self-start font-bold ml-12 mb-10 pt-4 hover:text-purple-400 transition-colors duration-300">
         Cognito
       </a>
-      <section className="animate-slide-up absolute bottom-0 w-full flex justify-center">
+      <section className="animate-slide-up mt-auto w-full flex justify-center">
         <div className="w-full max-w-4xl bg-[#191919] rounded-tl-lg rounded-tr-lg pt-10 px-10 pb-0 flex flex-col items-center space-y-12 mt-auto h-[800px]">
           <p className="text-white text-4xl md:text-5xl font-bold text-center w-full">
             LOGIN
@@ -85,7 +98,9 @@ const CognitoLogin: React.FC = () => {
             </Link>
           </div>
           {/* Continue with Google button */}
-          <button className="mb-4 w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold">
+          <button 
+          onClick={handleGoogleLogin}
+          className="mb-4 w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold">
             <img
               src="icon/google_icon.svg"
               alt="Google logo"
@@ -93,14 +108,14 @@ const CognitoLogin: React.FC = () => {
             />
             <span>Continue with Google</span>
           </button>
-          {/* Continue with Kakao button */}
+          {/* Continue with GitHub button */}
           <button className="w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold">
             <img
-              src="icon/kakao_icon.svg"
+              src="icon/github_icon.svg"
               className="w-8 h-8"
-              alt="Kakao logo"
+              alt="gitbub logo"
             />
-            <span>Continue with Kakao</span>
+            <span>Continue with Github</span>
           </button>
         </div>
       </section>

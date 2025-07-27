@@ -47,10 +47,22 @@ const CognitoLogin: React.FC = () => {
     },
   });
 
-  if (error) {
-    alert('❌ Google 로그인 실패: ' + error.message);
-  }
-};
+    if (error) {
+        alert('❌ Google 로그인 실패: ' + error.message);
+    }
+    };
+    const handleGithubLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+        redirectTo: 'https://icacobhgcxolgekoxbga.supabase.co/auth/v1/callback', // 또는 프로덕션 도메인
+        },
+    });
+
+    if (error) {
+        alert('❌ GitHub 로그인 실패: ' + error.message);
+    }
+    };
 
   return (
     <div className="w-full min-h-screen relative overflow-hidden bg-black flex flex-col items-center pt-5 pb-0">
@@ -109,7 +121,10 @@ const CognitoLogin: React.FC = () => {
             <span>Continue with Google</span>
           </button>
           {/* Continue with GitHub button */}
-          <button className="w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold">
+          <button 
+            onClick={handleGithubLogin}
+            className="w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold"
+            >
             <img
               src="icon/github_icon.svg"
               className="w-8 h-8"

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase'
@@ -63,6 +63,42 @@ const CognitoLogin: React.FC = () => {
         alert('❌ GitHub 로그인 실패: ' + error.message);
     }
     };
+
+    useEffect(() => {
+      const syncUser = async () => {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const user = session?.user;
+        if (!user) return;
+
+        const { data: existingUser, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', user.id)
+          .single();
+
+        if (!existingUser) {
+          const { email, user_metadata } = user;
+          const name = user_metadata?.name || email;
+
+          const { error: insertError } = await supabase.from('users').insert([
+            {
+              id: user.id,
+              email,
+              name,
+            },
+          ]);
+
+          if (insertError) {
+            console.error('❌ 사용자 등록 실패:', insertError.message);
+          }
+        }
+      };
+
+      syncUser();
+    }, []);
 
   return (
     <div className="w-full min-h-screen relative overflow-hidden bg-black flex flex-col items-center pt-5 pb-0">

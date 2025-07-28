@@ -38,3 +38,11 @@ body {
     }
   }
 }
+@keyframes bounceUp {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px); /* ⬅️ 여기 값을 늘리면 더 위로 이동 */
+  }
+}

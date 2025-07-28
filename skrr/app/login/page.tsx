@@ -102,72 +102,74 @@ const CognitoLogin: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen relative overflow-hidden bg-black flex flex-col items-center pt-5 pb-0">
-        <a href="/" className="text-white text-5xl self-start font-bold ml-12 mb-10 pt-4 hover:text-purple-400 transition-colors duration-300">
+        <a href="/" className="text-white text-3xl self-start font-bold ml-8 mb-10 pt-0 hover:text-purple-400 transition-colors duration-300">
         Cognito
       </a>
-      <section className="animate-slide-up mt-auto w-full flex justify-center">
-        <div className="w-full max-w-4xl bg-[#191919] rounded-tl-lg rounded-tr-lg pt-10 px-10 pb-0 flex flex-col items-center space-y-12 mt-auto h-[800px]">
-          <p className="text-white text-4xl md:text-5xl font-bold text-center w-full">
+      <section className="animate-slide-up mt-10 w-full h-full flex justify-center items-end">
+        <div className="w-full max-w-2xl bg-[#191919] rounded-lg pt-10 px-10 pb-10 flex flex-col items-center space-y-12 h-auto mb-0">
+          <p className="text-white text-3xl md:text-4xl font-bold text-center w-full">
             LOGIN
           </p>
-          <div className="w-full flex flex-col items-center space-y-8">
+          <div className="w-full flex flex-col items-center space-y-6">
             {/* ID input */}
-            <div className="w-full max-w-xl bg-[#191919] border border-[#e3e3e3] rounded-lg p-4">
+            <div className="w-full max-w-md bg-[#191919] border border-[#e3e3e3] rounded-lg p-3">
               <input
                 type="text"
                 placeholder="Enter your ID"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-transparent text-[#e3e3e3] placeholder-[#696969] text-xl sm:text-2xl md:text-3xl outline-none"
+                className="w-full bg-transparent text-[#e3e3e3] placeholder-[#696969] text-base sm:text-lg md:text-xl outline-none"
               />
             </div>
             {/* Password input */}
-            <div className="w-full max-w-xl bg-[#191919] border border-[#e3e3e3] rounded-lg p-4">
+            <div className="w-full max-w-md bg-[#191919] border border-[#e3e3e3] rounded-lg p-3">
               <input
                 type="password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent text-[#e3e3e3] placeholder-[#696969] text-xl sm:text-2xl md:text-3xl outline-none"
+                className="w-full bg-transparent text-[#e3e3e3] placeholder-[#696969] text-base sm:text-lg md:text-xl outline-none"
               />
             </div>
             {/* Sign in button */}
             <button
               type="button"
               onClick={handleLogin}
-              className="w-full max-w-xl bg-[#6d00d2] rounded-lg py-4 text-white text-xl sm:text-3xl font-semibold"
+              className="w-full max-w-md bg-[#6d00d2] rounded-lg py-2.5 text-white text-base sm:text-xl font-semibold"
             >
               sign in
             </button>
-            <Link href="/signup" className="w-full max-w-xl">
-              <button className="text-[#696969] text-2xl md:text-3xl text-center w-full">
+            {/* Sign up button */}
+            <Link href="/signup" className="w-full max-w-md mt-auto">
+              <button className="text-[#696969] text-lg md:text-xl text-center w-full">
                 sign up
               </button>
             </Link>
-          </div>
-          {/* Continue with Google button */}
-          <button 
-          onClick={handleGoogleLogin}
-          className="mb-4 w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold">
-            <img
-              src="icon/google_icon.svg"
-              alt="Google logo"
-              className="w-8 h-8"
-            />
-            <span>Continue with Google</span>
-          </button>
-          {/* Continue with GitHub button */}
-          <button 
-            onClick={handleGithubLogin}
-            className="w-full max-w-xl flex items-center justify-center space-x-6 bg-[#191919] border border-[#e3e3e3] rounded-full py-4 text-white text-xl sm:text-3xl font-semibold"
+            {/* Continue with Google button */}
+            <button 
+              onClick={handleGoogleLogin}
+              className="mt-2 mb-3 w-full max-w-md flex items-center justify-center space-x-4 bg-[#191919] border border-[#e3e3e3] rounded-full py-2.5 text-white text-base sm:text-xl font-semibold"
             >
-            <img
-              src="icon/github_icon.svg"
-              className="w-8 h-8"
-              alt="gitbub logo"
-            />
-            <span>Continue with Github</span>
-          </button>
+              <img
+                src="icon/google_icon.svg"
+                alt="Google logo"
+                className="w-6 h-6"
+              />
+              <span>Continue with Google</span>
+            </button>
+            {/* Continue with GitHub button */}
+            <button 
+              onClick={handleGithubLogin}
+              className="w-full max-w-md flex items-center justify-center space-x-4 bg-[#191919] border border-[#e3e3e3] rounded-full py-2.5 text-white text-base sm:text-xl font-semibold"
+            >
+              <img
+                src="icon/github_icon.svg"
+                className="w-6 h-6"
+                alt="gitbub logo"
+              />
+              <span>Continue with Github</span>
+            </button>
+          </div>
         </div>
       </section>
     </div>

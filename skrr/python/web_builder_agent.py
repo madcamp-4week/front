@@ -40,6 +40,7 @@ import json
 import os
 import re
 import sys
+import shutil
 from typing import Dict, Any
 
 # Attempt to lazily load environment variables from a .env file if python‑dotenv
@@ -181,6 +182,24 @@ def main(spec: str) -> None:
         llm=llm,
     )
 
+    # --- Define Usage Guide Agent ---
+    runner = Agent(
+        role="Usage Guide Agent",
+        goal=(
+            "Generate comprehensive README content for the Next.js project. Include:\n"
+            " 1) a brief project description based on the user's specification,\n"
+            " 2) a list of required npm dependencies and the installation command (e.g., npm install next react react-dom),\n"
+            " 3) environment variables needed (OPENAI_API_KEY, GEMINI_API_KEY, OPENAI_MODEL, GEMINI_MODEL, SERPER_API_KEY) with example export commands,\n"
+            " 4) common npm scripts (dev, build, start) and how to run them,\n"
+            " 5) a quick usage example showing how to start the development server and access the site."
+        ),
+        backstory=(
+            "You guide developers through running the web_builder_agent script, "
+            "explaining which environment variables to set and how to invoke the tool."
+        ),
+        llm=llm,
+    )
+
     # --- Define Tasks ---
     plan_task = Task(
         description=(
@@ -234,6 +253,16 @@ def main(spec: str) -> None:
             "A JSON object with 'project_name' (string) and 'files' (object mapping file paths to code strings)."
         ),
         agent=executor,
+    )
+
+    run_task = Task(
+        description=(
+            "After packaging the project, explain step-by-step how to run the generated "
+            "Next.js project and which environment variables (e.g., OPENAI_API_KEY, GEMINI_API_KEY, "
+            "OPENAI_MODEL, GEMINI_MODEL, SERPER_API_KEY) must be set. Include example shell commands."
+        ),
+        expected_output="A plain-text usage guide with commands and variable descriptions.",
+        agent=runner,
     )
 
     # Assemble and run the crew sequentially
@@ -299,8 +328,41 @@ def main(spec: str) -> None:
     # Write files to disk
     _write_files(files, project_dir)
 
-    # Report the project directory path as JSON
-    response = {"project_dir": project_dir}
+    # Generate usage guide via a separate Crew for run_task
+    guide_crew = Crew(
+        agents=[runner],
+        tasks=[run_task],
+        process=Process.sequential,
+        verbose=False,
+    )
+    try:
+        guide_result = guide_crew.kickoff(inputs={
+            "project_name": project_name,
+            "project_dir": project_dir,
+            "spec": spec
+        })
+        usage_text = guide_result if isinstance(guide_result, str) else str(guide_result)
+    except Exception:
+        usage_text = ""
+
+    # Write the generated README.md
+    readme_path = os.path.join(project_dir, "README.md")
+    with open(readme_path, "w", encoding="utf-8") as f:
+        f.write(usage_text.strip())
+
+    # Create a zip archive of the project directory in Next.js public/zip_folder
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    nextjs_root = os.path.abspath(os.path.join(script_dir, os.pardir))
+    public_zip_dir = os.path.join(nextjs_root, 'public', 'zip_folder')
+    os.makedirs(public_zip_dir, exist_ok=True)
+    zip_base = os.path.join(public_zip_dir, _sanitize_project_name(project_name))
+    shutil.make_archive(zip_base, "zip", project_dir)
+
+    # Build the client-accessible URL path
+    zip_path = f"/zip_folder/{_sanitize_project_name(project_name)}.zip"
+
+    # Report the zip file path as JSON
+    response = {"zip_path": zip_path}
     print(json.dumps(response))
 
 

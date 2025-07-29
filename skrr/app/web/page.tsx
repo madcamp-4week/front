@@ -56,23 +56,25 @@ export default function WebBuilderPage() {
         body: JSON.stringify({ prompt: description }),
       });
       const data = await res.json();
+      const { project_name, project_dir, zip_path } = data;
 
-      if (res.ok && data.project_dir) {
+      if (res.ok && zip_path) {
         // Update local history with the new project
         setHistory((prev) => [
           ...prev,
           {
             id: Date.now(),
             input: description,
-            project_name: data.project_name || description,
-            project_dir: data.project_dir,
+            project_name: project_name || description,
+            project_dir: zip_path,
           },
         ]);
 
         setMessages((prev) => [
           ...prev,
-          { type: 'system', content: `프로젝트가 생성되었습니다: ${data.project_name || description}` },
-          { type: 'system', content: `<span>파일 경로: ${data.project_dir}</span>` },
+          { type: 'system', content: `프로젝트가 생성되었습니다: ${project_name || description}` },
+          { type: 'system', content: `<span>파일 경로: ${zip_path}</span>` },
+          { type: 'system', content: `<a href="${zip_path}" download class="text-blue-400 underline">ZIP 파일 다운로드</a>` },
         ]);
       } else {
         setMessages((prev) => [
@@ -114,6 +116,7 @@ export default function WebBuilderPage() {
                 { type: 'user', content: item.input },
                 { type: 'system', content: `프로젝트가 생성되었습니다: ${item.project_name}` },
                 { type: 'system', content: `<span>파일 경로: ${item.project_dir}</span>` },
+                { type: 'system', content: `<a href="${item.project_dir}" download class="text-blue-400 underline">ZIP 파일 다운로드</a>` },
               ])
             }
             className="text-center w-full text-white mb-2 hover:text-purple-400 hover:bg-purple-900/30 rounded-md transition"

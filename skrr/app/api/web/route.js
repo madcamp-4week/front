@@ -8,7 +8,10 @@ export async function POST(request) {
 
   return new Promise((resolve) => {
     const scriptPath = path.join(process.cwd(), 'python', 'web_builder_agent.py');
-    const python = spawn('python3', [scriptPath, prompt], { env: process.env });
+    const python = spawn('python3', [scriptPath, prompt], {
+      env: process.env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
 
     let stdout = '';
     python.stdout.on('data', (data) => {

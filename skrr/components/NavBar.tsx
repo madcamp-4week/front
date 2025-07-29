@@ -1,14 +1,43 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -20,9 +49,9 @@ const NavBar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="/Product" className="text-gray-300 hover:text-white transition-colors">Product</a>
-            <a href="/Team" className="text-gray-300 hover:text-white transition-colors">Team</a>
-            <a href="/Enterprise" className="text-gray-300 hover:text-white transition-colors">Enterprise</a>
+            <a href="/product" className="text-gray-300 hover:text-white transition-colors">Product</a>
+            <a href="/team" className="text-gray-300 hover:text-white transition-colors">Team</a>
+            <a href="/enterprise" className="text-gray-300 hover:text-white transition-colors">Enterprise</a>
             <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
               Explore <ChevronRight className="w-4 h-4 ml-1" />
             </a>
@@ -34,17 +63,27 @@ const NavBar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search DOML"
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg w-48 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-            <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
-            <button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors">
-              Sign up
-            </button>
+            {user ? (
+              <div className="text-right">
+                <button
+                  onClick={handleLogout}
+                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-white"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link href="/login">
+                  <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
+                </Link>
+                <Link href="/signup">
+                  <button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors">
+                    Sign up
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Button */}
@@ -70,10 +109,25 @@ const NavBar = () => {
             <a href="#" className="block text-gray-300 hover:text-white transition-colors">Marketplace</a>
             <a href="#" className="block text-gray-300 hover:text-white transition-colors">Pricing</a>
             <div className="pt-4 border-t border-gray-800">
-              <button className="block w-full text-left text-gray-300 hover:text-white transition-colors mb-2">Sign in</button>
-              <button className="block w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-center">
-                Sign up
-              </button>
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="block w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-center"
+                >
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <button className="block w-full text-left text-gray-300 hover:text-white transition-colors mb-2">Sign in</button>
+                  </Link>
+                  <Link href="/signup">
+                    <button className="block w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-center">
+                      Sign up
+                    </button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -1,99 +1,84 @@
+/*
+ * web/page.tsx
+ *
+ * This page provides a UI to generate a new Next.js project based on a user
+ * specification using the `web_builder_agent.py` script on the backend. It
+ * closely mirrors the existing HomePage used for blog generation, but
+ * targets the `/api/web` endpoint instead of `/api/generate`. The results
+ * include the generated project directory, which can be stored and later
+ * retrieved via Supabase just like blog histories.
+ */
+
 'use client';
 
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import NavBar from '@/components/NavBar';
 import { SendHorizonal } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+// Supabase imports removed for now since persistence is disabled
 
-import { useSessionContext } from '@supabase/auth-helpers-react';
+interface Message {
+  type: 'user' | 'system';
+  content: string;
+}
 
-export default function HomePage() {
+interface HistoryItem {
+  id: number;
+  input: string;
+  project_name: string;
+  project_dir: string;
+}
+
+export default function WebBuilderPage() {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{ type: 'user' | 'system'; content: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<any[]>([]);
+  // Maintain history locally within the component; persistence is disabled.
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [userName, setUserName] = useState('');
+  // User name is static when Supabase is disabled
+  const [userName] = useState('사용자');
 
-  const { session } = useSessionContext();
-  const userId = session?.user?.id;
+  // Persistence and authentication via Supabase have been removed. History will
+  // only persist for the lifetime of this component instance.
 
-  useEffect(() => {
-    if (!session || !userId) return;
-
-    const fetchHistory = async () => {
-      const { data, error } = await supabase
-        .from('histories')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: true });
-
-      if (data) {
-        const historyItems = data.map((entry) => ({
-          id: entry.id,
-          input: entry.input,
-          title: entry.title,
-          url: entry.url,
-        }));
-        setHistory(historyItems);
-      }
-    };
-
-    fetchHistory();
-
-    const fetchUserName = async () => {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('name')
-        .eq('id', userId)
-        .single();
-
-      if (userData?.name) {
-        setUserName(userData.name);
-      }
-    };
-
-    fetchUserName();
-  }, [session, userId]);
-
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!input.trim() || loading) return;
-    const topic = input.trim();
+    const description = input.trim();
     setInput('');
     setLoading(true);
-    setMessages((prev) => [...prev, { type: 'user', content: topic }]);
+    setMessages((prev) => [...prev, { type: 'user', content: description }]);
 
     try {
-      const res = await fetch('/api/generate', {
+      const res = await fetch('/api/web', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic }),
+        body: JSON.stringify({ prompt: description }),
       });
       const data = await res.json();
 
-      if (!userId) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-
-      if (res.ok && data.title) {
-        await supabase.from('histories').insert([
+      if (res.ok && data.project_dir) {
+        // Update local history with the new project
+        setHistory((prev) => [
+          ...prev,
           {
-            user_id: userId,
-            input: topic,
-            title: data.title,
-            url: data.url,
-          }
+            id: Date.now(),
+            input: description,
+            project_name: data.project_name || description,
+            project_dir: data.project_dir,
+          },
         ]);
 
         setMessages((prev) => [
           ...prev,
-          { type: 'system', content: `블로그가 생성되었습니다: ${data.title}` },
-          { type: 'system', content: `<a href="${data.url}" target="_blank" class="underline text-blue-400">노션 페이지로 이동</a>` },
+          { type: 'system', content: `프로젝트가 생성되었습니다: ${data.project_name || description}` },
+          { type: 'system', content: `<span>파일 경로: ${data.project_dir}</span>` },
         ]);
       } else {
-        setMessages((prev) => [...prev, { type: 'system', content: `오류: ${data.error || '알 수 없는 오류'}` }]);
+        setMessages((prev) => [
+          ...prev,
+          { type: 'system', content: `오류: ${data.error || '알 수 없는 오류'}` },
+        ]);
       }
     } catch {
       setMessages((prev) => [...prev, { type: 'system', content: 'API 호출 중 오류가 발생했습니다.' }]);
@@ -116,11 +101,8 @@ const handleSubmit = async () => {
         }`}
       >
         <div className="relative w-full mb-4 text-center">
-          <h2 className="text-lg font-semibold text-purple-300">검색 기록</h2>
-          <button
-            onClick={() => setMessages([])}
-            className="absolute right-1 top-0.5"
-          >
+          <h2 className="text-lg font-semibold text-purple-300">생성 기록</h2>
+          <button onClick={() => setMessages([])} className="absolute right-1 top-0.5">
             <Image src="/icon/newpage_icon.svg" alt="초기화" width={18} height={18} />
           </button>
         </div>
@@ -130,8 +112,8 @@ const handleSubmit = async () => {
             onClick={() =>
               setMessages([
                 { type: 'user', content: item.input },
-                { type: 'system', content: `블로그가 생성되었습니다: ${item.title}` },
-                { type: 'system', content: `<a href="${item.url}" target="_blank" class="underline text-blue-400">노션 페이지로 이동</a>` },
+                { type: 'system', content: `프로젝트가 생성되었습니다: ${item.project_name}` },
+                { type: 'system', content: `<span>파일 경로: ${item.project_dir}</span>` },
               ])
             }
             className="text-center w-full text-white mb-2 hover:text-purple-400 hover:bg-purple-900/30 rounded-md transition"
@@ -140,21 +122,17 @@ const handleSubmit = async () => {
           </button>
         ))}
       </aside>
-      <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-          sidebarOpen ? 'pl-64' : ''
-        }`}
-      >
+      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? 'pl-64' : ''}`}>
         <div className="w-full">
           <NavBar />
         </div>
         <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24">
           <h1 className="text-2xl text-purple-400 font-semibold mb-6">
-            {userName || session?.user.email}님, 안녕하세요
+            {userName}님, 안녕하세요
           </h1>
           <div className="w-full max-w-2xl bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
             {messages.length === 0 ? (
-              <p className="text-gray-500 text-center">무엇이든 질문해보세요</p>
+              <p className="text-gray-500 text-center">생성할 프로젝트를 입력해보세요</p>
             ) : (
               <>
                 {messages.map((msg, idx) => (

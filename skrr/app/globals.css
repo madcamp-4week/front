@@ -24,3 +24,25 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+@layer utilities {
+  .animate-slide-up {
+    opacity: 0;
+    transform: translateY(40px);
+    animation: slide-up 0.7s ease-out forwards;
+  }
+
+  @keyframes slide-up {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+@keyframes bounceUp {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px); /* ⬅️ 여기 값을 늘리면 더 위로 이동 */
+  }
+}

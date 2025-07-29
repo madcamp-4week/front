@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import { ChevronRight, Menu, X } from 'lucide-react';
 import NavBar from '@/components/NavBar'; 
 import Link from 'next/link';
@@ -8,6 +10,16 @@ import Link from 'next/link';
 const AiMarketingLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -93,12 +105,22 @@ const AiMarketingLanding = () => {
               <p className="text-xl text-gray-300 mb-8 max-w-lg">
                 Our vision is to revolutionize the way brands and advertisers target, reach
               </p>
-               <Link href ="/Main">
-              <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25">
-                Get Started
-                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </button>
-              </Link>
+              {user ? (
+                <Link href="/main">
+                  <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25">
+                    Get Started
+                    <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </Link>
+              ) : (
+                <button
+                  onClick={() => router.push('/login')}
+                  className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
+                >
+                  Get Started
+                  <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
             </div>
 
             <div className="relative">
@@ -187,7 +209,16 @@ const AiMarketingLanding = () => {
           <span className="text-blue-400 underline">strategic execution</span>.
         </p>
         
-        <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300">
+        <button
+          className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300"
+          onClick={() => {
+            if (user) {
+              alert('✅ 더 많은 정보를 확인해보세요!');
+            } else {
+              router.push('/login');
+            }
+          }}
+        >
           Learn more
           <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
         </button>
@@ -242,7 +273,16 @@ const AiMarketingLanding = () => {
                 Learn More about how DOML can help you do just that - all with a simple, easy-to-use platform.
               </p>
               
-              <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300">
+              <button
+                className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300"
+                onClick={() => {
+                  if (user) {
+                    alert('✅ 자세한 정보를 보려면 계속 진행하세요!');
+                  } else {
+                    router.push('/login');
+                  }
+                }}
+              >
                 Learn more
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>

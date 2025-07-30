@@ -153,6 +153,7 @@ export default function IntegratedAgentPage() {
 
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           uploadedFilePaths = uploadData.files.map((f: any) => f.filePath);
         }
       } catch (error) {

@@ -34,6 +34,7 @@ const ConversationMemory: React.FC<ConversationMemoryProps> = ({
     if (savedMemories) {
       try {
         const parsed = JSON.parse(savedMemories);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setMemories(parsed.map((m: any) => ({
           ...m,
           timestamp: new Date(m.timestamp)

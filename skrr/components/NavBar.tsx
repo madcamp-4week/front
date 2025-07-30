@@ -59,16 +59,16 @@ const NavBar = () => {
                   </Link>
                 </>
               )}
-            <a href="/product" className="text-gray-300 hover:text-white transition-colors">Product</a>
-            <a href="/team" className="text-gray-300 hover:text-white transition-colors">Team</a>
-            <a href="/enterprise" className="text-gray-300 hover:text-white transition-colors">Enterprise</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
+            <Link href="/product" className="text-gray-300 hover:text-white transition-colors">Product</Link>
+            <Link href="/team" className="text-gray-300 hover:text-white transition-colors">Team</Link>
+            <Link href="/enterprise" className="text-gray-300 hover:text-white transition-colors">Enterprise</Link>
+            <Link href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
               Explore <ChevronRight className="w-4 h-4 ml-1" />
-            </a>
-            <a href="/market" className="text-gray-300 hover:text-white transition-colors">Marketplace</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
+            </Link>
+            <Link href="/market" className="text-gray-300 hover:text-white transition-colors">Marketplace</Link>
+            <Link href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
               Pricing <ChevronRight className="w-4 h-4 ml-1" />
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Actions */}
@@ -122,12 +122,12 @@ const NavBar = () => {
                 </Link>
               </>
             )}
-            <a href="#" className="block text-gray-300 hover:text-white transition-colors">Product</a>
-            <a href="#" className="block text-gray-300 hover:text-white transition-colors">Team</a>
-            <a href="#" className="block text-gray-300 hover:text-white transition-colors">Enterprise</a>
-            <a href="#" className="block text-gray-300 hover:text-white transition-colors">Explore</a>
-            <a href="#" className="block text-gray-300 hover:text-white transition-colors">Marketplace</a>
-            <a href="#" className="block text-gray-300 hover:text-white transition-colors">Pricing</a>
+            <Link href="#" className="block text-gray-300 hover:text-white transition-colors">Product</Link>
+            <Link href="#" className="block text-gray-300 hover:text-white transition-colors">Team</Link>
+            <Link href="#" className="block text-gray-300 hover:text-white transition-colors">Enterprise</Link>
+            <Link href="#" className="block text-gray-300 hover:text-white transition-colors">Explore</Link>
+            <Link href="#" className="block text-gray-300 hover:text-white transition-colors">Marketplace</Link>
+            <Link href="#" className="block text-gray-300 hover:text-white transition-colors">Pricing</Link>
             <div className="pt-4 border-t border-gray-800">
               {user ? (
                 <button

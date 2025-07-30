@@ -108,7 +108,7 @@ const AiMarketingLanding = () => {
               {user ? (
                 <Link href="/main">
                   <button className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25">
-                    Get Started
+                    AI 에이전트 시작하기
                     <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </Link>
@@ -117,7 +117,7 @@ const AiMarketingLanding = () => {
                   onClick={() => router.push('/login')}
                   className="group inline-flex items-center bg-transparent border border-white/30 hover:border-purple-500 px-8 py-4 rounded-full text-white hover:text-purple-400 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
                 >
-                  Get Started
+                  AI 에이전트 시작하기
                   <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>
               )}

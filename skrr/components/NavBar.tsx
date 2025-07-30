@@ -49,13 +49,23 @@ const NavBar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
+                          {user && (
+                <>
+                  <Link href="/main" className="text-gray-300 hover:text-white transition-colors">
+                    AI 에이전트
+                  </Link>
+                  <Link href="/combine" className="text-gray-300 hover:text-white transition-colors">
+                    에이전트 조합
+                  </Link>
+                </>
+              )}
             <a href="/product" className="text-gray-300 hover:text-white transition-colors">Product</a>
             <a href="/team" className="text-gray-300 hover:text-white transition-colors">Team</a>
             <a href="/enterprise" className="text-gray-300 hover:text-white transition-colors">Enterprise</a>
             <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
               Explore <ChevronRight className="w-4 h-4 ml-1" />
             </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Marketplace</a>
+            <a href="/market" className="text-gray-300 hover:text-white transition-colors">Marketplace</a>
             <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center">
               Pricing <ChevronRight className="w-4 h-4 ml-1" />
             </a>
@@ -102,6 +112,16 @@ const NavBar = () => {
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-black/95 backdrop-blur-sm border-b border-gray-800">
           <div className="px-4 py-6 space-y-4">
+            {user && (
+              <>
+                <Link href="/main" className="block text-gray-300 hover:text-white transition-colors">
+                  AI 에이전트
+                </Link>
+                <Link href="/combine" className="block text-gray-300 hover:text-white transition-colors">
+                  에이전트 조합
+                </Link>
+              </>
+            )}
             <a href="#" className="block text-gray-300 hover:text-white transition-colors">Product</a>
             <a href="#" className="block text-gray-300 hover:text-white transition-colors">Team</a>
             <a href="#" className="block text-gray-300 hover:text-white transition-colors">Enterprise</a>

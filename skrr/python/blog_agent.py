@@ -35,7 +35,7 @@ order and passing inputs as needed【289190495545497†L151-L163】.
 import json
 import os
 import sys
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 # Load environment variables from a .env file if present.  This allows the
 # Python script to find API keys and other settings even when they are not
@@ -359,9 +359,9 @@ def fetch_image_url(query: str) -> str | None:
     """DuckDuckGo를 이용해 첫 번째 이미지 URL을 가져옵니다."""
     try:
         with DDGS() as ddgs:
-            results = ddgs.images(query, max_results=1)
-            for result in results:
-                return result["image"]  # 직접 링크
+            results = list(ddgs.images(query, max_results=1))
+            if results and len(results) > 0:
+                return results[0]["image"]  # 직접 링크
     except Exception:
         pass
     return None

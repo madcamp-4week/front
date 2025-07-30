@@ -2,9 +2,9 @@ import { spawn } from 'child_process';
 import { supabase } from '@/lib/supabase';
 
 export async function POST(req) {
-  const { topic, userId } = await req.json();
-  if (!topic || typeof topic !== 'string') {
-    return new Response(JSON.stringify({ error: 'Invalid topic' }), { status: 400 });
+  const { request, userId } = await req.json();
+  if (!request || typeof request !== 'string') {
+    return new Response(JSON.stringify({ error: 'Invalid analysis request' }), { status: 400 });
   }
 
   // 사용자 설정 가져오기
@@ -28,8 +28,6 @@ export async function POST(req) {
   // 환경 변수와 사용자 설정을 병합
   const env = {
     ...process.env,
-    ...(userSettings.notion_token && { NOTION_TOKEN: userSettings.notion_token }),
-    ...(userSettings.notion_database_id && { NOTION_DATABASE_ID: userSettings.notion_database_id }),
     ...(userSettings.openai_api_key && { OPENAI_API_KEY: userSettings.openai_api_key }),
     ...(userSettings.gemini_api_key && { GEMINI_API_KEY: userSettings.gemini_api_key }),
     ...(userSettings.serper_api_key && { SERPER_API_KEY: userSettings.serper_api_key })
@@ -37,8 +35,8 @@ export async function POST(req) {
 
   const pythonProcess = spawn('python', [
     '-W', 'ignore',
-    'python/blog_agent.py',
-    topic,
+    'python/data_analysis_agent.py',
+    request,
   ], { env });
 
   let stdout = '';
@@ -66,4 +64,4 @@ export async function POST(req) {
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON from Python' }), { status: 500 });
   }
-}
+} 

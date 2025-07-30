@@ -31,7 +31,7 @@ export default function EnterprisePage() {
         </div>
         <div className="grid md:grid-cols-3 gap-12">
           {[
-            {
+            { 
               title: 'Financial Services',
               desc: 'Automated compliance agents, risk analysis assistants, and multi-modal reporting bots.',
             },
